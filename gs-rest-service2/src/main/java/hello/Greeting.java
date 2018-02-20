@@ -3,18 +3,76 @@ package hello;
 public class Greeting {
 
     private final long id;
-    private final String content;
-
-    public Greeting(long id, String content) {
+    private final String tdyDesc;
+    private final float tdyHigh;
+    private final float tdyLow;
+    private final String tmwDesc;
+    private final float tmwHigh;
+    private final float tmwLow;
+    
+    public Greeting(long id) {
         this.id = id;
-        this.content = content;
+    }
+    
+    public Greeting(long id, String tdyDesc, float tdyHigh, float tdyLow, String tmwDesc, float tmwHigh, float tmwLow) {
+        this.id = id;
+        this.tdyDesc = tdyDesc;
+        this.tdyHigh = tdyHigh;
+        this.tdyLow = tdyLow;
+        this.tmwDesc = tmwDesc;
+        this.tmwHigh = tmwHigh;
+        this.tmwLow = tmwLow;
     }
 
     public long getId() {
         return id;
     }
 
-    public String getContent() {
-        return content;
+    public void setTdyDesc(String tdyDesc) {
+    	this.tdyDesc = tdyDesc;
+    }
+    
+    public void setTdyHigh(float tdyHigh) {
+    	this.tdyHigh = tdyHigh;
+    }
+    
+    public void setTdyLow(float tdyLow) {
+    	this.tdyLow = tdyLow;
+    }
+    
+    public void setTmwDesc(String tmwDesc) {
+    	this.tmwDesc = tmwDesc;
+    }
+    
+    public void setTmwHigh(float tmwHigh) {
+    	this.tmwHigh = tmwHigh;
+    }
+    
+    public void setTmwLow(float tmwLow) {
+    	this.tmwLow = tmwLow;
+    }
+    
+    public String getTdyDesc() {
+        return tdyDesc;
+    }
+    
+    public float getTdyHigh() {
+    	return tdyHigh;
+    }
+    
+    public float getTdyLow() {
+    	return tdyLow;
+    }
+    
+    public String getTmwDesc() {
+        return tmwDesc;
+    }
+    
+    public float getTmwHigh() {
+    	return tmwHigh;
+    }
+    
+    public float getTmwLow() {
+    	return tmwLow;
     }
 }
