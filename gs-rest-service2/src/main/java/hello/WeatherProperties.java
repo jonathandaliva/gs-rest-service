@@ -1,3 +1,5 @@
+package hello;
+
 import java.util.List;
 
 public class WeatherProperties {

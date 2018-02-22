@@ -1,3 +1,5 @@
+package hello;
+
 public class WeatherPeriods {
 	//public long time;
     public String shortForecast;

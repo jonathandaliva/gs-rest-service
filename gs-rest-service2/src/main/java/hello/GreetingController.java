@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -21,7 +25,7 @@ public class GreetingController {
 	private final AtomicLong counter = new AtomicLong();
 
 	@RequestMapping("/greeting")
-	public Greeting greeting(@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon, ) {
+	public Greeting greeting(@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon ) throws ClientProtocolException, IOException {
 		//38.803328, -77.039026
 		//https://api.weather.gov/points/38.803328,-77.039026/forecast
 		String data="";
@@ -36,7 +40,7 @@ public class GreetingController {
 		HttpResponse response = client.execute(httpget);
 		final int statusCode = response.getStatusLine().getStatusCode();
 		
-		Greeting greetingResponse = new Greeting(counter.incrementAndGet())
+		Greeting greetingResponse = new Greeting(counter.incrementAndGet());
 		if (statusCode != HttpStatus.SC_OK) {
 			System.out.println( "Error " + statusCode + " for URL " + url);
 		} else {

@@ -2,13 +2,13 @@ package hello;
 
 public class Greeting {
 
-    private final long id;
-    private final String tdyDesc;
-    private final float tdyHigh;
-    private final float tdyLow;
-    private final String tmwDesc;
-    private final float tmwHigh;
-    private final float tmwLow;
+    private long id;
+    private String tdyDesc;
+    private float tdyHigh;
+    private float tdyLow;
+    private String tmwDesc;
+    private float tmwHigh;
+    private float tmwLow;
     
     public Greeting(long id) {
         this.id = id;
