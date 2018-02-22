@@ -3,6 +3,7 @@ package hello;
 public class Greeting {
 
     private long id;
+    private boolean validResponse;
     private String tdyDesc;
     private float tdyHigh;
     private float tdyLow;
@@ -10,8 +11,9 @@ public class Greeting {
     private float tmwHigh;
     private float tmwLow;
     
-    public Greeting(long id) {
+    public Greeting(long id, boolean validResponse) {
         this.id = id;
+        this.validResponse = validResponse;
     }
     
     public Greeting(long id, String tdyDesc, float tdyHigh, float tdyLow, String tmwDesc, float tmwHigh, float tmwLow) {
@@ -30,6 +32,14 @@ public class Greeting {
 
     public void setTdyDesc(String tdyDesc) {
     	this.tdyDesc = tdyDesc;
+    }
+    
+    public long getValidResponse() {
+        return id;
+    }
+
+    public void setValidResponse(boolean validResponse) {
+    	this.validResponse = validResponse;
     }
     
     public void setTdyHigh(float tdyHigh) {

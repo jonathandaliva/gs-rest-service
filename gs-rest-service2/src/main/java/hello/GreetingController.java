@@ -40,7 +40,7 @@ public class GreetingController {
 		HttpResponse response = client.execute(httpget);
 		final int statusCode = response.getStatusLine().getStatusCode();
 		
-		Greeting greetingResponse = new Greeting(counter.incrementAndGet());
+		Greeting greetingResponse = new Greeting(counter.incrementAndGet(), false);
 		if (statusCode != HttpStatus.SC_OK) {
 			System.out.println( "Error " + statusCode + " for URL " + url);
 		} else {
@@ -55,26 +55,34 @@ public class GreetingController {
 			Reader reader = new InputStreamReader(getResponseEntity.getContent());
 			
 			WeatherResponse parsedresponse = gson.fromJson(reader, WeatherResponse.class);
-			WeatherPeriods objPeriod = parsedresponse.properties.periods.get(0);
-			System.out.println("today Desc: " + String.valueOf(objPeriod.shortForecast));
-			System.out.println("today high: " + String.valueOf(objPeriod.temperature));
-			greetingResponse.setTdyDesc(objPeriod.shortForecast);
-			greetingResponse.setTdyHigh(objPeriod.temperature);
-			
-			objPeriod = parsedresponse.properties.periods.get(1);
-			System.out.println("today low: " + String.valueOf(objPeriod.temperature));
-			greetingResponse.setTdyLow(objPeriod.temperature);
-			
-			objPeriod = parsedresponse.properties.periods.get(2);
-			System.out.println("tomorrow Desc: " + String.valueOf(objPeriod.shortForecast));
-			System.out.println("tomorrow high: " + String.valueOf(objPeriod.temperature));
-			greetingResponse.setTmwDesc(objPeriod.shortForecast);
-			greetingResponse.setTmwHigh(objPeriod.temperature);
-			
-			objPeriod = parsedresponse.properties.periods.get(3);
-			System.out.println("tomorrow low: " + String.valueOf(objPeriod.temperature));
-			greetingResponse.setTmwLow(objPeriod.temperature);
-			
+			if ( parsedresponse == null ) {
+				System.out.println("There was no valid JSON response.");
+			} else if ( parsedresponse.properties == null ) {
+				System.out.println("There were no properties in the JSON.");
+			} else if ( parsedresponse.properties.periods == null ) {
+				System.out.println("There were no forcast periods in the JSON.");
+			} else {
+				WeatherPeriods objPeriod = parsedresponse.properties.periods.get(0);
+				System.out.println("today Desc: " + String.valueOf(objPeriod.shortForecast));
+				System.out.println("today high: " + String.valueOf(objPeriod.temperature));
+				greetingResponse.setTdyDesc(objPeriod.shortForecast);
+				greetingResponse.setTdyHigh(objPeriod.temperature);
+				
+				objPeriod = parsedresponse.properties.periods.get(1);
+				System.out.println("today low: " + String.valueOf(objPeriod.temperature));
+				greetingResponse.setTdyLow(objPeriod.temperature);
+				
+				objPeriod = parsedresponse.properties.periods.get(2);
+				System.out.println("tomorrow Desc: " + String.valueOf(objPeriod.shortForecast));
+				System.out.println("tomorrow high: " + String.valueOf(objPeriod.temperature));
+				greetingResponse.setTmwDesc(objPeriod.shortForecast);
+				greetingResponse.setTmwHigh(objPeriod.temperature);
+				
+				objPeriod = parsedresponse.properties.periods.get(3);
+				System.out.println("tomorrow low: " + String.valueOf(objPeriod.temperature));
+				greetingResponse.setTmwLow(objPeriod.temperature);
+				greetingResponse.setValidResponse(true);
+			}
 			System.out.println("------------------DONE----------------------");
 			
 		}
