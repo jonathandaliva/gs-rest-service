@@ -34,8 +34,8 @@ public class Greeting {
     	this.tdyDesc = tdyDesc;
     }
     
-    public long getValidResponse() {
-        return id;
+    public boolean getValidResponse() {
+        return validResponse;
     }
 
     public void setValidResponse(boolean validResponse) {

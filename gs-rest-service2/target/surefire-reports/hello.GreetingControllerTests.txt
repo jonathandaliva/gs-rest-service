@@ -1,4 +1,20 @@
 -------------------------------------------------------------------------------
 Test set: hello.GreetingControllerTests
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.913 sec - in hello.GreetingControllerTests
+Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 4.858 sec <<< FAILURE! - in hello.GreetingControllerTests
+noParamGreetingShouldReturnDefaultMessage(hello.GreetingControllerTests)  Time elapsed: 2.353 sec  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.content", exception: No results for path: $['content']
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:245)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers$2.match(JsonPathResultMatchers.java:100)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:171)
+	at hello.GreetingControllerTests.noParamGreetingShouldReturnDefaultMessage(GreetingControllerTests.java:43)
+
+paramGreetingShouldReturnTailoredMessage(hello.GreetingControllerTests)  Time elapsed: 0.606 sec  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.content", exception: No results for path: $['content']
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:245)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers$2.match(JsonPathResultMatchers.java:100)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:171)
+	at hello.GreetingControllerTests.paramGreetingShouldReturnTailoredMessage(GreetingControllerTests.java:51)
+

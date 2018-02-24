@@ -28,13 +28,15 @@ public class GreetingController {
 	public Greeting greeting(@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon ) throws ClientProtocolException, IOException {
 		//38.803328, -77.039026
 		//https://api.weather.gov/points/38.803328,-77.039026/forecast
-		String data="";
+		//String data="";
 		
 		//call api, parse json, create simple one.
 		
 		HttpClient client = HttpClientBuilder.create().build();
 		String url = "https://api.weather.gov/points/"+lat+","+lon+"/forecast";
 		HttpGet httpget = new HttpGet(url);
+		httpget.setHeader("User-Agent", "Simple Fucking Weather API");
+		httpget.setHeader("Accept", "application/vnd.noaa.dwml+xml;version=1");
 		
 		System.out.println("executing request " + httpget.getURI());
 		HttpResponse response = client.execute(httpget);
