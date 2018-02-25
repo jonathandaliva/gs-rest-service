@@ -64,23 +64,32 @@ public class GreetingController {
 			} else if ( parsedresponse.properties.periods == null ) {
 				System.out.println("There were no forcast periods in the JSON.");
 			} else {
-				WeatherPeriods objPeriod = parsedresponse.properties.periods.get(0);
-				System.out.println("today Desc: " + String.valueOf(objPeriod.shortForecast));
-				System.out.println("today high: " + String.valueOf(objPeriod.temperature));
-				greetingResponse.setTdyDesc(objPeriod.shortForecast);
-				greetingResponse.setTdyHigh(objPeriod.temperature);
+				int index = 0;
 				
-				objPeriod = parsedresponse.properties.periods.get(1);
+				WeatherPeriods objPeriod = parsedresponse.properties.periods.get(index);
+				index=index+1;
+				greetingResponse.setTdyDesc(objPeriod.shortForecast);
+				System.out.println("today Desc: " + String.valueOf(objPeriod.shortForecast));
+				if(objPeriod.isDaytime) {
+					System.out.println("today high: " + String.valueOf(objPeriod.temperature));
+					greetingResponse.setTdyHigh(objPeriod.temperature);
+					objPeriod = parsedresponse.properties.periods.get(index);
+					index=index+1;
+				} else {
+					greetingResponse.setTdyHigh(999);
+				}
 				System.out.println("today low: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTdyLow(objPeriod.temperature);
 				
-				objPeriod = parsedresponse.properties.periods.get(2);
+				objPeriod = parsedresponse.properties.periods.get(index);
+				index=index+1;
 				System.out.println("tomorrow Desc: " + String.valueOf(objPeriod.shortForecast));
 				System.out.println("tomorrow high: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTmwDesc(objPeriod.shortForecast);
 				greetingResponse.setTmwHigh(objPeriod.temperature);
 				
-				objPeriod = parsedresponse.properties.periods.get(3);
+				objPeriod = parsedresponse.properties.periods.get(index);
+				
 				System.out.println("tomorrow low: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTmwLow(objPeriod.temperature);
 				greetingResponse.setValidResponse(true);

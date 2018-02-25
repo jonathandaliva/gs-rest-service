@@ -5,4 +5,5 @@ public class WeatherPeriods {
     public String shortForecast;
     public float temperature;
     public int number;
+    public boolean isDaytime;
 }
