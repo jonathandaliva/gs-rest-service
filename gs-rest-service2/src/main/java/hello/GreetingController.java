@@ -25,6 +25,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class GreetingController {
 
 	private final AtomicLong counter = new AtomicLong();
+	/* TODO cache in SQL? Would need to cache per point for each request...
 	private final AtomicLong lastUpdate = new AtomicLong();
 	private final AtomicBoolean updatingWeather = new AtomicBoolean();
 	private final AtomicInteger TdyDesc = new AtomicInteger();
@@ -33,12 +34,14 @@ public class GreetingController {
 	private final AtomicInteger TmwDesc = new AtomicInteger();
 	private final AtomicInteger TmwHigh = new AtomicInteger();
 	private final AtomicInteger TmwLow = new AtomicInteger();
-
+	*/
+	
 	@RequestMapping("/forecast")
 	public Greeting greeting(@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon ) throws ClientProtocolException, IOException {
 		//call api, parse json, create simple one.
-		boolean callApiNow = false;
+		//boolean callApiNow = false;
 		Greeting greetingResponse = new Greeting(counter.incrementAndGet(), false);
+		/*
 		//Check if the lastUpdate was more than 7200000 ago and if the values are being updated.
 		//	If it's not that old or it's already being updated, use the cached values.
 		if ( System.currentTimeMillis() - lastUpdate.get() > 7200000 ) {
@@ -48,20 +51,22 @@ public class GreetingController {
 				callApiNow = true;
 			}
 		}
-		
+		*/
 		//Call the API
-		if ( callApiNow ) {
+		//if ( callApiNow ) {
 			try {
 				System.out.println("Calling API.");
-				updatingWeather.set(true);
+				//updatingWeather.set(true);
 				greetingResponse = callApi(greetingResponse, lat, lon);
-				updatingWeather.set(false);
-				lastUpdate.set(System.currentTimeMillis());
+				//updatingWeather.set(false);
+				//lastUpdate.set(System.currentTimeMillis());
 			} catch(Exception e) {
-				callApiNow = false;
+				//callApiNow = false;
+				greetingResponse.setValidResponse(false);
 			}
-		}
+		//}
 		
+		/* TODO if caching, need to cache by point and return by point
 		//Either the API was called within 2 hours or the API response was bad.  Set return values to cached values
 		if( !callApiNow ) {
 			System.out.println("Setting values from cache.");
@@ -73,6 +78,7 @@ public class GreetingController {
 			greetingResponse.setTmwLow((float)(TmwLow.get()/100));
 			greetingResponse.setValidResponse(true);
 		}
+		*/
 		return greetingResponse;
 	}
 	
@@ -118,12 +124,12 @@ public class GreetingController {
 				WeatherPeriods objPeriod = parsedresponse.properties.periods.get(index);
 				index=index+1;
 				greetingResponse.setTdyDesc(objPeriod.shortForecast);
-				TdyDesc.set(getDescCode(objPeriod.shortForecast));
+				//TdyDesc.set(getDescCode(objPeriod.shortForecast));
 				System.out.println("today Desc: " + String.valueOf(objPeriod.shortForecast));
 				if(objPeriod.isDaytime) {
 					System.out.println("today high: " + String.valueOf(objPeriod.temperature));
 					greetingResponse.setTdyHigh(objPeriod.temperature);
-					TdyHigh.set((int)(objPeriod.temperature*100));
+					//TdyHigh.set((int)(objPeriod.temperature*100));
 					objPeriod = parsedresponse.properties.periods.get(index);
 					index=index+1;
 				} else {
@@ -131,20 +137,20 @@ public class GreetingController {
 				}
 				System.out.println("today low: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTdyLow(objPeriod.temperature);
-				TdyLow.set((int)(objPeriod.temperature*100));
+				//TdyLow.set((int)(objPeriod.temperature*100));
 				objPeriod = parsedresponse.properties.periods.get(index);
 				index=index+1;
 				System.out.println("tomorrow Desc: " + String.valueOf(objPeriod.shortForecast));
 				System.out.println("tomorrow high: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTmwDesc(objPeriod.shortForecast);
-				TmwDesc.set(getDescCode(objPeriod.shortForecast));
+				//TmwDesc.set(getDescCode(objPeriod.shortForecast));
 				greetingResponse.setTmwHigh(objPeriod.temperature);
-				TmwHigh.set((int)(objPeriod.temperature*100));
+				//TmwHigh.set((int)(objPeriod.temperature*100));
 				objPeriod = parsedresponse.properties.periods.get(index);
 				
 				System.out.println("tomorrow low: " + String.valueOf(objPeriod.temperature));
 				greetingResponse.setTmwLow(objPeriod.temperature);
-				TmwLow.set((int)(objPeriod.temperature*100));
+				//TmwLow.set((int)(objPeriod.temperature*100));
 				greetingResponse.setValidResponse(true);
 			}
 			System.out.println("------------------DONE----------------------");
