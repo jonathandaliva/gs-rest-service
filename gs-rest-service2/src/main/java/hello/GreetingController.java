@@ -1,10 +1,12 @@
 package hello;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.servlet.http.HttpServletRequest;
+
+//import java.util.concurrent.atomic.AtomicInteger;
+//import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
@@ -29,45 +31,59 @@ public class GreetingController {
 	private final AtomicLong lastUpdate = new AtomicLong();
 	private final AtomicBoolean updatingWeather = new AtomicBoolean();
 	private final AtomicInteger TdyDesc = new AtomicInteger();
-	private final AtomicInteger TdyHigh = new AtomicInteger();
-	private final AtomicInteger TdyLow = new AtomicInteger();
+	private final AtomicInteger TdyHigh = new AtomicInteger(999);
+	private final AtomicInteger TdyLow = new AtomicInteger(999);
 	private final AtomicInteger TmwDesc = new AtomicInteger();
-	private final AtomicInteger TmwHigh = new AtomicInteger();
-	private final AtomicInteger TmwLow = new AtomicInteger();
+	private final AtomicInteger TmwHigh = new AtomicInteger(999);
+	private final AtomicInteger TmwLow = new AtomicInteger(999);
 	*/
 	
 	@RequestMapping("/forecast")
-	public Greeting greeting(@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon ) throws ClientProtocolException, IOException {
+	public Greeting greeting(HttpServletRequest request ) throws ClientProtocolException, IOException {
 		//call api, parse json, create simple one.
-		//boolean callApiNow = false;
+		//boolean callApiNow = true;
 		Greeting greetingResponse = new Greeting(counter.incrementAndGet(), false);
-		/*
-		//Check if the lastUpdate was more than 7200000 ago and if the values are being updated.
+		/* //Check if the lastUpdate was more than 7200000 ago and if the values are being updated.
 		//	If it's not that old or it's already being updated, use the cached values.
+		System.out.println(String.valueOf(System.currentTimeMillis() - lastUpdate.get()));
 		if ( System.currentTimeMillis() - lastUpdate.get() > 7200000 ) {
 			System.out.println("lastUpdate is older than 2 hours.");
 			if ( !updatingWeather.get() ) {
 				System.out.println("updatingWeather is false.");
 				callApiNow = true;
 			}
+		}*/
+		
+		//@RequestParam(value="lat", defaultValue="38.803328") String lat, @RequestParam(value="lon", defaultValue="-77.039026") String lon, 
+		String ip = request.getHeader("X-FORWARDED-FOR");
+		if ( ip == null || ip == "") {
+			ip = request.getRemoteAddr();
+		} else {
+			ip = ip.split(",")[0];
 		}
-		*/
+		//call http://api.ipstack.com/134.201.250.155?access_key=26e8546e6586e706b4d3757e1a3d65bd&fields=latitude,longitude
+		System.out.println("Request IP: " + ip);
+		greetingResponse.setIP(ip);
+		
 		//Call the API
 		//if ( callApiNow ) {
 			try {
-				System.out.println("Calling API.");
+				System.out.println("Calling Geo IP API.");
+				String[] coordinates = callGeoIpApi(ip);
+				
 				//updatingWeather.set(true);
-				greetingResponse = callApi(greetingResponse, lat, lon);
+				System.out.println("Calling Weather API.");
+				greetingResponse = callWeatherApi(greetingResponse, coordinates[0], coordinates[1]);
 				//updatingWeather.set(false);
 				//lastUpdate.set(System.currentTimeMillis());
 			} catch(Exception e) {
+				System.out.println("API calls threw an exception. " + e.toString());
 				//callApiNow = false;
 				greetingResponse.setValidResponse(false);
 			}
 		//}
 		
-		/* TODO if caching, need to cache by point and return by point
-		//Either the API was called within 2 hours or the API response was bad.  Set return values to cached values
+		/*Either the API was called within 2 hours or the API response was bad.  Set return values to cached values
 		if( !callApiNow ) {
 			System.out.println("Setting values from cache.");
 			greetingResponse.setTdyDesc(getDescText(TdyDesc.get()));
@@ -77,12 +93,51 @@ public class GreetingController {
 			greetingResponse.setTmwHigh((float)(TmwHigh.get()/100));
 			greetingResponse.setTmwLow((float)(TmwLow.get()/100));
 			greetingResponse.setValidResponse(true);
-		}
-		*/
+		}*/
 		return greetingResponse;
 	}
 	
-	private Greeting callApi(Greeting greetingResponse, String lat, String lon) throws Exception {
+	private String[] callGeoIpApi(String ip) throws Exception {
+
+		HttpClient client = HttpClientBuilder.create().build();
+		String url = "http://api.ipstack.com/"+ip+"?access_key=26e8546e6586e706b4d3757e1a3d65bd&fields=latitude,longitude";
+		HttpGet httpget = new HttpGet(url);
+		httpget.setHeader("User-Agent", "Simple Fucking Weather API");
+		httpget.setHeader("Accept", "application/vnd.noaa.dwml+xml;version=1");
+		
+		System.out.println("executing request " + httpget.getURI());
+		HttpResponse response = client.execute(httpget);
+		final int statusCode = response.getStatusLine().getStatusCode();
+		
+		if (statusCode != HttpStatus.SC_OK) {
+			System.out.println( "Error " + statusCode + " for URL " + url);
+			throw new Exception("Api errored out.");
+		} else {
+			System.out.println("----------------------------------------");
+			System.out.println(response.toString());
+			System.out.println("----------------------------------------");
+			
+			HttpEntity getResponseEntity = response.getEntity();
+			
+			Gson gson = new Gson();
+			
+			Reader reader = new InputStreamReader(getResponseEntity.getContent());
+			
+			GeoIpResponse parsedresponse = gson.fromJson(reader, GeoIpResponse.class);
+			if ( parsedresponse == null || parsedresponse.latitude == null || parsedresponse.latitude == "null") {
+				System.out.println("There was no valid JSON response.");
+				//throw new Exception("There was no valid JSON response.");
+				return new String[] { "38.803328", "-77.039026" };
+			} else {
+				System.out.println("------------------DONE----------------------");
+				return new String[] { parsedresponse.latitude , parsedresponse.longitude };
+			}
+			
+		}
+		
+	}
+	
+	private Greeting callWeatherApi(Greeting greetingResponse, String lat, String lon) throws Exception {
 
 		HttpClient client = HttpClientBuilder.create().build();
 		String url = "https://api.weather.gov/points/"+lat+","+lon+"/forecast";
@@ -159,6 +214,7 @@ public class GreetingController {
 		return greetingResponse;
 	}
 	
+	/*
 	private String getDescText(int code) {
 		if( code == 1 ) {
 			return "Clear";
@@ -200,7 +256,8 @@ public class GreetingController {
 			return 4;
 		} else if ( description.contains("Snow") ) {
 			return 5;
-		} else if ( description.contains("Ice") || description.contains("Freez") || description.contains("Blizzard") ) {
+		//} else if ( description.contains("Ice") || description.contains("Freez") || description.contains("Blizzard") ) {
+		} else if ( description.contains("Ice") ) {
 			return 6;
 		} else if ( description.contains("Thunderstorm") ) {
 			return 7;
@@ -218,4 +275,5 @@ public class GreetingController {
 			return 1;
 		}
 	}
+	*/
 }

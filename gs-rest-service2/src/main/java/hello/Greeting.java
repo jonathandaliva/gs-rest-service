@@ -4,6 +4,7 @@ public class Greeting {
 
     private long id;
     private boolean validResponse;
+    private String IP;
     private String tdyDesc;
     private float tdyHigh;
     private float tdyLow;
@@ -30,6 +31,10 @@ public class Greeting {
         return id;
     }
 
+    public void setIP(String ip) {
+    	this.IP = ip;
+    }
+    
     public void setTdyDesc(String tdyDesc) {
     	this.tdyDesc = tdyDesc;
     }
@@ -60,6 +65,10 @@ public class Greeting {
     
     public void setTmwLow(float tmwLow) {
     	this.tmwLow = tmwLow;
+    }
+    
+    public String getIP() {
+        return IP;
     }
     
     public String getTdyDesc() {
